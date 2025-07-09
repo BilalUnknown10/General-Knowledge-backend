@@ -30,7 +30,30 @@ const userRegistration = async (req, res) => {
     }
 };
 
+const userLogin = async (req, res) => {
+    try {
+        const {email, password} = req.body;
+        
+        // checking user details in DB
+        const loginUser = await User.findOne({email});
+
+        if(!loginUser) return res.status(404).json("Invalid Credentials");
+
+        // checking password is correct or not
+        const isMatchPassword = await loginUser.comparePassword(password);
+        if(!isMatchPassword) return res.status(400).json("Invalid Credentials");
+
+        return res.status(200).json("User login successfully");
+
+    } catch (error) {
+        console.log("error user login api controller : ", error);
+    }
+}
 
 
 
-module.exports = {userRegistration}
+
+module.exports = {
+    userRegistration,
+    userLogin
+}
