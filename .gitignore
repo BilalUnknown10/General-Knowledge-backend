@@ -1,0 +1,36 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage directory
+coverage/
+
+# Build output
+dist/
+build/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Optional: if you're using yarn
+yarn.lock
+
+# Optional: if you're using PM2
+pids
+*.pid
+*.seed
+
+# Optional: Mac system file
+*.DS_Store
