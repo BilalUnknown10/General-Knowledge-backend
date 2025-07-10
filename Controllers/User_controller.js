@@ -1,4 +1,5 @@
 const User = require("../Models/user_model");
+const generate_JWT = require("../Utils/generate_JWT");
 
 // Registration Api
 const userRegistration = async (req, res) => {
@@ -20,6 +21,11 @@ const userRegistration = async (req, res) => {
 
         if(!newUser) return res.status(500).json("Internal Server Error");
 
+        // generate jwt token for authentication
+        const token = await generate_JWT(newUser._id);
+
+        console.log("jwt from registration : ",token);
+
         return res.status(201).json({
             message : "User create successfully",
             user : newUser
@@ -30,6 +36,8 @@ const userRegistration = async (req, res) => {
     }
 };
 
+
+// Login Api
 const userLogin = async (req, res) => {
     try {
         const {email, password} = req.body;
@@ -49,8 +57,6 @@ const userLogin = async (req, res) => {
         console.log("error user login api controller : ", error);
     }
 }
-
-
 
 
 module.exports = {
