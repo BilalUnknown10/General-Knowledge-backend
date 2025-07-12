@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema({
 
   userProfileImage : {
     type : String
+  },
+  
+  publicId : {
+    type : String
   }
 });
 

@@ -1,5 +1,5 @@
 const User = require("../Models/user_model");
-const { uploadOnCloudinary } = require("../Utils/cloudinary");
+const { uploadOnCloudinary, deleteOnCloudinary } = require("../Utils/cloudinary");
 const generate_JWT = require("../Utils/generate_JWT");
 
 // Registration Api
@@ -72,11 +72,17 @@ const editUserProfileImage = async (req, res) => {
     const file = req.file;
     if(!file) return res.status(400).json("Field are required");
 
+    const oldProfileImage = await User.findById(req.user._id);
+    const oldProfileImageURL = oldProfileImage?.publicId;
+    const deleteOldProfileImage = await deleteOnCloudinary(oldProfileImageURL);
+
     const cloudinaryFilePath = await uploadOnCloudinary(req.file?.path);
     const profileImageURL = cloudinaryFilePath?.url;
+    const publicId = cloudinaryFilePath?.public_id;
 
     const updateProfileImage = await User.findByIdAndUpdate(req.user._id,{
-        userProfileImage : profileImageURL
+        userProfileImage : profileImageURL,
+        publicId : publicId
     },{new : true});
     
     return res.status(200).json("Profile image uploaded successfully");

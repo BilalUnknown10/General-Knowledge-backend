@@ -14,7 +14,7 @@ cloudinary.config({
         resource_type : "image",
         folder : "general knowledge website"
     });
-    console.log("file uploaded Successfully : ",response);
+    
     fs.unlinkSync(localFilePath);
     return response;
     } catch (error) {
@@ -23,6 +23,17 @@ cloudinary.config({
     }
   };
 
+  const deleteOnCloudinary = async (oldFilePath) => {
+    try {
+        if(!oldFilePath) return null;
+        const response = await cloudinary.uploader.destroy(oldFilePath);
+        console.log(response);
+        return response;
+    } catch (error) {
+        console.log("error in cloudinary delete image : ", error);
+    }
+  }
 
 
-  module.exports = {uploadOnCloudinary}
+
+  module.exports = {uploadOnCloudinary, deleteOnCloudinary}
