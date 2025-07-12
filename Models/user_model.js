@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+
+  userProfileImage : {
+    type : String
+  }
 });
 
 // hash user password pre hook

@@ -1,4 +1,5 @@
 const User = require("../Models/user_model");
+const { uploadOnCloudinary } = require("../Utils/cloudinary");
 const generate_JWT = require("../Utils/generate_JWT");
 
 // Registration Api
@@ -28,14 +29,14 @@ const userRegistration = async (req, res) => {
 
         return res.status(201).json({
             message : "User create successfully",
-            user : newUser
+            user : newUser,
+            token : token
         });
         
     } catch (error) {
         console.log("error in user registration user controller", error);
     }
 };
-
 
 // Login Api
 const userLogin = async (req, res) => {
@@ -51,15 +52,44 @@ const userLogin = async (req, res) => {
         const isMatchPassword = await loginUser.comparePassword(password);
         if(!isMatchPassword) return res.status(400).json("Invalid Credentials");
 
-        return res.status(200).json("User login successfully");
+        const token = await generate_JWT(loginUser._id);
+
+        return res.status(200).json({message : "User login successfully", token : token});
 
     } catch (error) {
         console.log("error user login api controller : ", error);
     }
+};
+
+// Logout Api
+const userLogout = async (req, res) => {
+    return res.status(200).json("Logout successfully");
+};
+
+// Edit user profile image
+const editUserProfileImage = async (req, res) => {
+   try {
+    const file = req.file;
+    if(!file) return res.status(400).json("Field are required");
+
+    const cloudinaryFilePath = await uploadOnCloudinary(req.file?.path);
+    const profileImageURL = cloudinaryFilePath?.url;
+
+    const updateProfileImage = await User.findByIdAndUpdate(req.user._id,{
+        userProfileImage : profileImageURL
+    },{new : true});
+    
+    return res.status(200).json("Profile image uploaded successfully");
+    
+   } catch (error) {
+    console.log("error in editUserProfileImage : ", error);
+   }
 }
 
 
 module.exports = {
     userRegistration,
-    userLogin
+    userLogin,
+    userLogout,
+    editUserProfileImage
 }
