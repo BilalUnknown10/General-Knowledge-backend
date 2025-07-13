@@ -24,7 +24,20 @@ const userSchema = new mongoose.Schema({
   
   publicId : {
     type : String
-  }
+  },
+
+  submittedAnswers: [
+    {
+      answer: {
+        type: String,
+        required: true
+      },
+      status: {
+        type: Boolean,
+        default: false
+      }
+    }
+  ]
 });
 
 // hash user password pre hook

@@ -4,7 +4,8 @@ const {
     userRegistration,
     userLogin,
     userLogout,
-    editUserProfileImage
+    editUserProfileImage,
+    userSubmitAnswer
 } = require('../Controllers/User_controller');
 const authMiddleware = require('../Middlewares/Auth_middleware');
 const upload = require('../Middlewares/Multer_middleware');
@@ -12,8 +13,11 @@ const upload = require('../Middlewares/Multer_middleware');
 // User routes
 router.route('/userRegistration').post(userRegistration);
 router.route('/userLogin').post(userLogin);
+
+// protected route
 router.route('/userLogout').post(authMiddleware, userLogout);
-router.route('/editUserProfileImage').post(authMiddleware, upload.single("profileImage"), editUserProfileImage)
+router.route('/editUserProfileImage').post(authMiddleware, upload.single("profileImage"), editUserProfileImage);
+router.route('/userSubmitAnswer/:id').post(authMiddleware, userSubmitAnswer);
 
 
 

@@ -1,7 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const router = require('./routes/User_routes');
+const userRoutes = require('./routes/User_routes');
+const adminRoutes = require('./Routes/Admin_routes')
 const dataBaseConnection = require('./db_Connection/conn');
 const PORT = process.env.PORT;
 
@@ -14,7 +15,9 @@ app.use(express.urlencoded({extended : true}));
 dataBaseConnection();
 
 // Routing setup
-app.use("/user",router);
+app.use("/user", userRoutes);
+app.use("/admin", adminRoutes);
+
 
 
 app.listen(PORT, () => {

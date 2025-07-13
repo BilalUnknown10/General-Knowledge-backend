@@ -1,6 +1,7 @@
 const User = require("../Models/user_model");
 const { uploadOnCloudinary, deleteOnCloudinary } = require("../Utils/cloudinary");
 const generate_JWT = require("../Utils/generate_JWT");
+const MCQ = require('../Models/MCQS_model');
 
 // Registration Api
 const userRegistration = async (req, res) => {
@@ -72,14 +73,17 @@ const editUserProfileImage = async (req, res) => {
     const file = req.file;
     if(!file) return res.status(400).json("Field are required");
 
+    // Find old user profile image if exist and delete from cloudinary
     const oldProfileImage = await User.findById(req.user._id);
     const oldProfileImageURL = oldProfileImage?.publicId;
     const deleteOldProfileImage = await deleteOnCloudinary(oldProfileImageURL);
 
+    // Update new profile image to cloudinary
     const cloudinaryFilePath = await uploadOnCloudinary(req.file?.path);
     const profileImageURL = cloudinaryFilePath?.url;
     const publicId = cloudinaryFilePath?.public_id;
 
+    // save new profile image cloudinary url in database
     const updateProfileImage = await User.findByIdAndUpdate(req.user._id,{
         userProfileImage : profileImageURL,
         publicId : publicId
@@ -90,12 +94,48 @@ const editUserProfileImage = async (req, res) => {
    } catch (error) {
     console.log("error in editUserProfileImage : ", error);
    }
-}
+};
+
+// User submit answers Api
+const userSubmitAnswer = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const {submitAnswer} = req.body;
+        
+        // checking if fields are not empty
+        if(!id) return res.status(400).json({message : "Id are required"});
+        if(!submitAnswer) return res.status(400).json({message : "Please select one of the following"});
+
+        const submit = {
+            answer : submitAnswer,
+            status : false
+        };
+
+        const getMcqDocument = await MCQ.findById(id);
+
+        if(!getMcqDocument) return res.status(500).json({message : "Internal server error"});
+
+        if(submitAnswer === getMcqDocument.correctAnswer) {
+            submit.status = true
+        }
+
+        const saveAnswer = await User.findByIdAndUpdate(req.user._id, {
+            $push : {submittedAnswers : submit}
+        },{new : true});
+
+        if(!saveAnswer) return res.status(500).json({message : "Internal server error"});
+
+        return res.status(200).json({message : "Your answer submitted successfully", saveAnswer});
+    } catch (error) {
+        console.log("error in user submit answer Api in user controller : ", error);
+    }
+};
 
 
 module.exports = {
     userRegistration,
     userLogin,
     userLogout,
-    editUserProfileImage
+    editUserProfileImage,
+    userSubmitAnswer
 }
