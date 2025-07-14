@@ -9,6 +9,9 @@ const uploadMCQ = async (req, res) => {
         if(!question) return res.status(400).json("Question filed are required");
         if(!answers) return res.status(400).json("Answers filed are required");
         if(!correctAnswer) return res.status(400).json("Correct answer filed are required");
+        console.log(req.user.isAdmin);
+
+        if(!req.user.isAdmin) return res.status(400).json({message : "Your are not admin please contact with admin"});
 
         // checking if MCQ are not exist
         const checkingMCQ = await MCQ.findOne({correctAnswer : correctAnswer});

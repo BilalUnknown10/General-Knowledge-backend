@@ -2,6 +2,7 @@ const User = require("../Models/user_model");
 const { uploadOnCloudinary, deleteOnCloudinary } = require("../Utils/cloudinary");
 const generate_JWT = require("../Utils/generate_JWT");
 const MCQ = require('../Models/MCQS_model');
+const sendMail = require("../Utils/send_mail");
 
 // Registration Api
 const userRegistration = async (req, res) => {
@@ -26,7 +27,23 @@ const userRegistration = async (req, res) => {
         // generate jwt token for authentication
         const token = await generate_JWT(newUser._id);
 
-        console.log("jwt from registration : ",token);
+        const mailOptions = {
+            from: '"General Knowledge"',
+            to: email,
+            subject: 'Welcome! Your Account Has Been Successfully Created',
+            html: `
+                <h2>Welcome to General Knowledge 🎉</h2>
+                <p>Hi <strong>${userName}</strong>,</p>
+                <p>Your account has been successfully created.</p>
+                <p>You can now <a href="https://your-app-url.com/login">log in</a> and start using our services.</p>
+                <br>
+                <p>If you have any questions, just reply to this email — we're happy to help.</p>
+                <br>
+                <p>Cheers,<br>The General Knowledge Team</p>
+            `,
+        };
+
+        sendMail(mailOptions);
 
         return res.status(201).json({
             message : "User create successfully",
@@ -111,14 +128,17 @@ const userSubmitAnswer = async (req, res) => {
             status : false
         };
 
-        const getMcqDocument = await MCQ.findById(id);
+        // getting Mcq model
+        const getMcqDocument = await MCQ.findById({_id : id});
 
         if(!getMcqDocument) return res.status(500).json({message : "Internal server error"});
 
+        // checking user answer are true are not
         if(submitAnswer === getMcqDocument.correctAnswer) {
             submit.status = true
         }
 
+        // save submitted answer in user model
         const saveAnswer = await User.findByIdAndUpdate(req.user._id, {
             $push : {submittedAnswers : submit}
         },{new : true});
