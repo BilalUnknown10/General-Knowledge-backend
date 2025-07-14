@@ -11,11 +11,27 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendMail = async (mailOptions) => {
-    transporter.sendMail({
-        to: mailOptions.to,
-        subject : mailOptions.subject,
-        html : mailOptions.html
-    })
+   try {
+     transporter.sendMail({
+         to: mailOptions.to,
+         subject : mailOptions.subject,
+         html : mailOptions.html
+     })
+   } catch (error) {
+    console.log("error in send email in utils folder",error);
+   }
 };
 
-module.exports = sendMail;
+const isEmailValid = async (securityOptions) => {
+    try {
+        transporter.sendMail({
+            to : securityOptions.to,
+            subject : securityOptions.subject,
+            html : securityOptions.html
+        });
+    } catch (error) {
+        console.log("error in security email in utils folder",error);
+    }
+}
+
+module.exports = {sendMail, isEmailValid};
