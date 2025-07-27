@@ -9,8 +9,6 @@ const { sendMail, isEmailValid } = require("../Utils/send_mail");
 const { generate4DigitCode } = require("../Utils/generate_code");
 let app = null;
 
-console.log("This is from variable", app);
-
 // Registration Api
 const userRegistration = async (req, res) => {
   try {
