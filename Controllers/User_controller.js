@@ -15,15 +15,27 @@ const userRegistration = async (req, res) => {
     const { userName, email, password } = req.body;
 
     // validation checking field are not empty
-    if (!userName) return res.status(400).json("Username are required");
+    if (!userName) return res.status(400).json("Name are required");
     if (!email) return res.status(400).json("Email are required");
     if (!password) return res.status(400).json("Password are required");
+    if (
+      !email.includes("@") ||
+      !email.includes(".com") ||
+      !email.includes("gmail")
+    ) {
+      return res
+        .status(400)
+        .json({
+          field: "invalidGmail",
+          message: "Only Gmail addresses are allowed",
+        });
+    }
 
     // checking user already exist
     const checkExistingUser = await User.findOne({ email });
 
     if (checkExistingUser)
-      return res.status(409).json("User already exist with this email");
+      return res.status(409).json({field : "existUser", message : "User exist with this email please login"});
 
     // create new user
     const newUser = await User.create({ userName, email, password });
@@ -196,13 +208,11 @@ const userVerificationOTP = async (req, res) => {
     `,
     };
 
-     isEmailValid(mailOptions);
+    isEmailValid(mailOptions);
 
-    return res
-      .status(200)
-      .json({
-        message: `verification code has been sent to ${req.user.email}`,
-      });
+    return res.status(200).json({
+      message: `verification code has been sent to ${req.user.email}`,
+    });
   } catch (error) {
     console.log(
       "error in user verification code api in use controller : ",
@@ -216,15 +226,22 @@ const userEmailVerification = async (req, res) => {
     const { verificationCode } = req.body;
     if (!verificationCode)
       return rs.status(400).json({ message: "Please Enter verification code" });
-    if(verificationCode !== app) return res.status(400).json({message : "Invalid code"});
+    if (verificationCode !== app)
+      return res.status(400).json({ message: "Invalid code" });
 
-    console.log(req.user)
-    
-    const emailVerified = await User.findByIdAndUpdate(req.user._id,{
-        isEmailVerified : true
-    },{new: true});
+    console.log(req.user);
 
-    return res.status(200).json({message : "Email successfully verified : ", emailVerified});
+    const emailVerified = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        isEmailVerified: true,
+      },
+      { new: true }
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Email successfully verified : ", emailVerified });
   } catch (error) {
     console.log(
       "error in user email verification api use controller : ",
