@@ -81,7 +81,7 @@ const userLogin = async (req, res) => {
     // checking user details in DB
     const loginUser = await User.findOne({ email });
 
-    if (!loginUser) return res.status(404).json("Invalid Credentials");
+    if (!loginUser) return res.status(404).json("This user are not exist please register");
 
     // checking password is correct or not
     const isMatchPassword = await loginUser.comparePassword(password);
