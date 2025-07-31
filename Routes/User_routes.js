@@ -9,6 +9,7 @@ const {
     userSubmitAnswer,
     userVerificationOTP,
     userEmailVerification,
+    userDetails,
 } = require('../Controllers/User_controller');
 
 // User routes
@@ -19,8 +20,9 @@ router.route('/userLogin').post(userLogin);
 router.route('/userLogout').post(authMiddleware, userLogout);
 router.route('/editUserProfileImage').post(authMiddleware, upload.single("profileImage"), editUserProfileImage);
 router.route('/userSubmitAnswer/:id').post(authMiddleware, userSubmitAnswer);
-router.route('/userVerificationOTP').post(authMiddleware, userVerificationOTP)
+router.route('/userVerificationOTP').get(authMiddleware, userVerificationOTP)
 router.route('/userEmailVerification').post(authMiddleware, userEmailVerification);
+router.route('/userDetails').get(authMiddleware, userDetails);
 
 
 

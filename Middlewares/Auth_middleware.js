@@ -17,7 +17,7 @@ const authMiddleware = async (req, res, next) => {
     // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const decodedUser = await User.findById({_id : decoded.id});
+    const decodedUser = await User.findById({_id : decoded.id}).select("-password");
     
     // Attach user data to request object (optional)
     req.user = decodedUser;

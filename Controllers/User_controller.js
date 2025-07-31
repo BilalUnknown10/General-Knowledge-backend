@@ -9,6 +9,8 @@ const { sendMail, isEmailValid } = require("../Utils/send_mail");
 const { generate4DigitCode } = require("../Utils/generate_code");
 let app = null;
 
+ console.log("set time in : ",app)
+
 // Registration Api
 const userRegistration = async (req, res) => {
   try {
@@ -70,7 +72,7 @@ const userRegistration = async (req, res) => {
     });
   } catch (error) {
     console.log("error in user registration user controller", error);
-  }
+  };
 };
 
 // Login Api
@@ -189,6 +191,10 @@ const userVerificationOTP = async (req, res) => {
     const generatedCode = await generate4DigitCode();
     app = generatedCode;
 
+    setTimeout(() => {
+      app = null
+    }, 60000 * 10);
+
     const email = req.user.email;
 
     const mailOptions = {
@@ -223,13 +229,14 @@ const userVerificationOTP = async (req, res) => {
 
 const userEmailVerification = async (req, res) => {
   try {
-    const { verificationCode } = req.body;
-    if (!verificationCode)
+    const { OTP } = req.body;
+
+    const verificationCode = Number(OTP);
+  
+    if (!OTP)
       return rs.status(400).json({ message: "Please Enter verification code" });
     if (verificationCode !== app)
       return res.status(400).json({ message: "Invalid code" });
-
-    console.log(req.user);
 
     const emailVerified = await User.findByIdAndUpdate(
       req.user._id,
@@ -250,6 +257,15 @@ const userEmailVerification = async (req, res) => {
   }
 };
 
+// User details
+const userDetails = async (req,res) => {
+  try {
+    return res.status(200).json(req.user)
+  } catch (error) {
+    console.log("error in user details Api in user controller file", error);
+  }
+}
+
 module.exports = {
   userRegistration,
   userLogin,
@@ -258,4 +274,5 @@ module.exports = {
   userSubmitAnswer,
   userVerificationOTP,
   userEmailVerification,
+  userDetails
 };
