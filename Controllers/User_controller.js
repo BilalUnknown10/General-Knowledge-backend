@@ -9,8 +9,6 @@ const { sendMail, isEmailValid } = require("../Utils/send_mail");
 const { generate4DigitCode } = require("../Utils/generate_code");
 let app = null;
 
- console.log("set time in : ",app)
-
 // Registration Api
 const userRegistration = async (req, res) => {
   try {
@@ -141,6 +139,8 @@ const userSubmitAnswer = async (req, res) => {
   try {
     const { id } = req.params;
     const { submitAnswer } = req.body;
+    console.log("front end ans : ", submitAnswer);
+    console.log("front end question id : ", id);
 
     // checking if fields are not empty
     if (!id) return res.status(400).json({ message: "Id are required" });
@@ -172,7 +172,7 @@ const userSubmitAnswer = async (req, res) => {
         $push: { submittedAnswers: submit },
       },
       { new: true }
-    );
+    ).select("-password");
 
     if (!saveAnswer)
       return res.status(500).json({ message: "Internal server error" });
@@ -266,6 +266,15 @@ const userDetails = async (req,res) => {
   }
 }
 
+const getAllQuestions = async (req, res) => {
+  try {
+    const getAllQuestions = await MCQ.find();
+    return res.status(200).json(getAllQuestions);
+  } catch (error) {
+    console.log("error get all question api in user controller");
+  }
+}
+
 module.exports = {
   userRegistration,
   userLogin,
@@ -274,5 +283,6 @@ module.exports = {
   userSubmitAnswer,
   userVerificationOTP,
   userEmailVerification,
-  userDetails
+  userDetails,
+  getAllQuestions
 };
