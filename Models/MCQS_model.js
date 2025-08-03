@@ -1,22 +1,22 @@
 const mongoose = require('mongoose');
 
-const MCQSchema = new mongoose.Schema({
-    question : {
-        type : String,
-        required : true
-    },
+    const MCQSchema = new mongoose.Schema({
+        question : {
+            type : String,
+            required : true
+        },
 
-    answers : {
-        type : [String],
-        required : true
-    },
-    
-    correctAnswer : {
-        type : String,
-        required : true,
-        unique : true
-    }
-});
+        answers : {
+            type : [String],
+            required : true
+        },
+        
+        correctAnswer : {
+            type : String,
+            required : true,
+            unique : true
+        }
+    });
 
 const MCQ = mongoose.model("MCQ", MCQSchema);
 

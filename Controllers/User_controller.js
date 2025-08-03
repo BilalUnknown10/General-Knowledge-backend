@@ -40,7 +40,7 @@ const userRegistration = async (req, res) => {
     // create new user
     const newUser = await User.create({ userName, email, password });
 
-    if (!newUser) return res.status(500).json("Internal Server Error");
+    if (!newUser) return res.status(500).json({message : "Internal Server Error"});
 
     // generate jwt token for authentication
     const token = await generate_JWT(newUser._id);
@@ -64,8 +64,8 @@ const userRegistration = async (req, res) => {
     sendMail(mailOptions);
 
     return res.status(201).json({
-      message: "User create successfully",
-      user: newUser,
+      message: "Account created successfully",
+      // user: newUser,
       token: token,
     });
   } catch (error) {
@@ -137,13 +137,11 @@ const editUserProfileImage = async (req, res) => {
 // User submit answers Api
 const userSubmitAnswer = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { _id } = req.params;
     const { submitAnswer } = req.body;
-    console.log("front end ans : ", submitAnswer);
-    console.log("front end question id : ", id);
 
     // checking if fields are not empty
-    if (!id) return res.status(400).json({ message: "Id are required" });
+    if (!_id) return res.status(400).json({ message: "Id are required" });
     if (!submitAnswer)
       return res
         .status(400)
@@ -155,10 +153,11 @@ const userSubmitAnswer = async (req, res) => {
     };
 
     // getting Mcq model
-    const getMcqDocument = await MCQ.findById({ _id: id });
+    const getMcqDocument = await MCQ.findById(_id);
 
     if (!getMcqDocument)
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: "Internal server error not get document" });
+  
 
     // checking user answer are true are not
     if (submitAnswer === getMcqDocument.correctAnswer) {
@@ -175,7 +174,7 @@ const userSubmitAnswer = async (req, res) => {
     ).select("-password");
 
     if (!saveAnswer)
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: "Internal server error saved user" });
 
     return res
       .status(200)
@@ -248,7 +247,7 @@ const userEmailVerification = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "Email successfully verified : ", emailVerified });
+      .json({ message: "Email verified successfully", emailVerified });
   } catch (error) {
     console.log(
       "error in user email verification api use controller : ",
