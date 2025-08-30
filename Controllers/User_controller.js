@@ -7,6 +7,7 @@ const generate_JWT = require("../Utils/generate_JWT");
 const MCQ = require("../Models/MCQS_model");
 const { sendMail, isEmailValid } = require("../Utils/send_mail");
 const { generate4DigitCode } = require("../Utils/generate_code");
+const Feedback = require("../Models/Feedback_model");
 let app = null;
 
 // Registration Api
@@ -265,12 +266,45 @@ const userDetails = async (req,res) => {
   }
 }
 
+// Get all questions
 const getAllQuestions = async (req, res) => {
   try {
     const getAllQuestions = await MCQ.find();
     return res.status(200).json(getAllQuestions);
   } catch (error) {
     console.log("error get all question api in user controller");
+  }
+}
+
+// save user Feedback
+const userFeedback = async (req, res) => {
+  try {
+    const {name, email, image, feedback} = req.body;
+    if(!name || !email) return res.status(500).json({message : "Internal server error"});
+    if(!feedback) return res.status(300).json({message : "feedback are required"});
+
+    const saveUserFeedback = await Feedback.create({
+      name,
+      email,
+      image,
+      feedback
+    });
+
+    if(!saveUserFeedback) return res.status(500).json({message : "Internal server error"});
+
+    return res.status(201).json({message : "Feedback added successfully Thank You"});
+  } catch (error) {
+    console.log("error in user feedback save api : ", error);
+  }
+}
+
+// Get all feedbacks
+const getAllFeedbacks = async (req, res) => {
+  try {
+    const allFeedbacks = await Feedback.find();
+    return res.status(200).json({allFeedbacks});
+  } catch (error) {
+    console.log("Error in get all feedbacks : ", error);
   }
 }
 
@@ -283,5 +317,7 @@ module.exports = {
   userVerificationOTP,
   userEmailVerification,
   userDetails,
-  getAllQuestions
+  getAllQuestions,
+  userFeedback,
+  getAllFeedbacks
 };

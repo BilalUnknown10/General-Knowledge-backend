@@ -11,6 +11,8 @@ const {
     userEmailVerification,
     userDetails,
     getAllQuestions,
+    userFeedback,
+    getAllFeedbacks,
 } = require('../Controllers/User_controller');
 
 // User routes
@@ -25,6 +27,8 @@ router.route('/userVerificationOTP').get(authMiddleware, userVerificationOTP)
 router.route('/userEmailVerification').post(authMiddleware, userEmailVerification);
 router.route('/userDetails').get(authMiddleware, userDetails);
 router.route('/getAllQuestions').get(authMiddleware, getAllQuestions);
+router.route("/feedback").post(authMiddleware,userFeedback);
+router.route('/getAllFeedbacks').get(getAllFeedbacks);
 
 
 
