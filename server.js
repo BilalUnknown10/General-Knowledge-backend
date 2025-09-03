@@ -25,6 +25,10 @@ dataBaseConnection();
 app.use("/user", userRoutes);
 app.use("/admin", adminRoutes);
 
+app.use('/',(req, res) => {
+    res.send("Hello This from gk server");
+});
+
 
 
 app.listen(PORT, () => {
