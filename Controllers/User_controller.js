@@ -216,6 +216,10 @@ const userVerificationOTP = async (req, res) => {
 
     await sendMail(mailOptions);
 
+    const saveOTPInDb = await User.findByIdAndUpdate(req.user._id,
+      {$set : {OTP : generatedCode}}
+    );
+
     return res.status(200).json({
       message: `verification code has been sent to ${req.user.email}`,
     });
@@ -235,7 +239,7 @@ const userEmailVerification = async (req, res) => {
   
     if (!OTP)
       return rs.status(400).json({ message: "Please Enter verification code" });
-    if (verificationCode !== app)
+    if (verificationCode !== req.user.OTP)
       return res.status(400).json({ message: "Invalid code" });
 
     const emailVerified = await User.findByIdAndUpdate(

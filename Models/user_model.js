@@ -47,7 +47,8 @@ const userSchema = new mongoose.Schema({
   isEmailVerified : {
     type : Boolean,
     default : false
-  }
+  },
+  OTP : {type : Number}
 });
 
 // hash user password pre hook
