@@ -92,7 +92,7 @@ const userLogin = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "User login successfully", token: token });
+      .json({ message: "login successfully", token });
   } catch (error) {
     console.log("error user login api controller : ", error);
   }
