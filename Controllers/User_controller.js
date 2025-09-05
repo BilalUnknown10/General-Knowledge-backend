@@ -62,7 +62,7 @@ const userRegistration = async (req, res) => {
             `,
     };
 
-    sendMail(mailOptions);
+    await sendMail(mailOptions);
 
     return res.status(201).json({
       message: "Account created successfully",
@@ -189,7 +189,7 @@ const userSubmitAnswer = async (req, res) => {
 const userVerificationOTP = async (req, res) => {
   try {
     const generatedCode = await generate4DigitCode();
-    app = generatedCode;
+    // app = generatedCode;
 
     setTimeout(() => {
       app = null
@@ -214,7 +214,7 @@ const userVerificationOTP = async (req, res) => {
     `,
     };
 
-    isEmailValid(mailOptions);
+    await sendMail(mailOptions);
 
     return res.status(200).json({
       message: `verification code has been sent to ${req.user.email}`,
