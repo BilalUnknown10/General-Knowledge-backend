@@ -62,7 +62,7 @@ const userRegistration = async (req, res) => {
             `,
     };
 
-    await sendMail(mailOptions);
+    sendMail(mailOptions);
 
     return res.status(201).json({
       message: "Account created successfully",
