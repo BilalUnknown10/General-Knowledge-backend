@@ -31,6 +31,8 @@ app.use('/',(req, res) => {
 
 
 
-app.listen(PORT, () => {
-    console.log(`Server is running on ${PORT} port`);
-});
+// app.listen(PORT, () => {
+//     console.log(`Server is running on ${PORT} port`);
+// });
+
+module.exports = app;
