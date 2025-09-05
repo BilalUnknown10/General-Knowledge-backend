@@ -214,7 +214,7 @@ const userVerificationOTP = async (req, res) => {
     `,
     };
 
-    await sendMail(mailOptions);
+     sendMail(mailOptions);
 
     const saveOTPInDb = await User.findByIdAndUpdate(req.user._id,
       {$set : {OTP : generatedCode}}
