@@ -26,12 +26,16 @@ const sendMail = async (mailOptions) => {
 
 const isEmailValid = async (securityOptions) => {
   try {
-    transporter.sendMail({
+   const info = await transporter.sendMail({
       from: `"General Knowledge" <${process.env.USER}>`,
       to: securityOptions.to,
       subject: securityOptions.subject,
       html: securityOptions.html
     });
+
+    console.log(info);
+
+    return info
     
   } catch (error) {
     console.log("Error in security email in utils folder");
