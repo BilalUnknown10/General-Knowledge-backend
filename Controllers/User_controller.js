@@ -47,7 +47,7 @@ const userRegistration = async (req, res) => {
     const token = await generate_JWT(newUser._id);
 
     const mailOptions = {
-      from: '"General Knowledge"',
+      // from: '"General Knowledge"',
       to: email,
       subject: "Welcome! Your Account Has Been Successfully Created",
       html: `
