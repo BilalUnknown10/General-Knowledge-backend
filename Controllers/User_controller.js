@@ -5,7 +5,7 @@ const {
 } = require("../Utils/cloudinary");
 const generate_JWT = require("../Utils/generate_JWT");
 const MCQ = require("../Models/MCQS_model");
-const { sendMail, isEmailValid } = require("../Utils/send_mail");
+const { sendEmail, isEmailValid } = require("../Utils/send_mail");
 const { generate4DigitCode } = require("../Utils/generate_code");
 const Feedback = require("../Models/Feedback_model");
 let app = null;
@@ -62,7 +62,7 @@ const userRegistration = async (req, res) => {
             `,
     };
 
-    sendMail(mailOptions);
+    await sendEmail(mailOptions);
 
     return res.status(201).json({
       message: "Account created successfully",
@@ -198,7 +198,7 @@ const userVerificationOTP = async (req, res) => {
     const email = req.user.email;
 
     const mailOptions = {
-      from: `"General Knowledge"`,
+      // from: `"General Knowledge"`,
       to: email,
       subject: "Your Verification Code",
       html: `
@@ -214,7 +214,7 @@ const userVerificationOTP = async (req, res) => {
     `,
     };
 
-     await sendMail(mailOptions);
+     await sendEmail(mailOptions);
 
     const saveOTPInDb = await User.findByIdAndUpdate(req.user._id,
       {$set : {OTP : generatedCode}}
