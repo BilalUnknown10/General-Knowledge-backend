@@ -107,24 +107,25 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
   port: 587,
+  secure: false, // important for port 587
   auth: {
-    user: process.env.UserBrevo,
-    pass: process.env.BREVO_SMTP_KEY,
+    user: process.env.BREVO_USER,     // set in Railway
+    pass: process.env.BREVO_PASS,     // set in Railway
   },
 });
 
 const sendMail = async (mailOptions) => {
   try {
     await transporter.sendMail({
-      from: `"General Knowledge" <${process.env.USER}>`, // must include FROM
+      from: `"General Knowledge" <${process.env.BREVO_FROM}>`, 
       to: mailOptions.to,
       subject: mailOptions.subject,
-      html: mailOptions.html
+      html: mailOptions.html,
     });
+    console.log("✅ Email sent successfully");
   } catch (error) {
-    console.log("❌ Error in send email in utils folder:", error);
+    console.error("❌ Error in send email in utils folder:", error.message);
   }
 };
 
-
-module.exports = {sendMail}
+module.exports = { sendMail };
