@@ -102,30 +102,63 @@
 
 
 // send email through brevo.com
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false, // important for port 587
-  auth: {
-    user: process.env.BREVO_USER,     // set in Railway
-    pass: process.env.BREVO_PASS,     // set in Railway
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   host: "smtp-relay.brevo.com",
+//   port: 587,
+//   secure: false, // important for port 587
+//   auth: {
+//     user: process.env.BREVO_USER,     // set in Railway
+//     pass: process.env.BREVO_PASS,     // set in Railway
+//   },
+// });
 
-const sendMail = async (mailOptions) => {
+// const sendMail = async (mailOptions) => {
+//   try {
+//     await transporter.sendMail({
+//       from: `"General Knowledge" <${process.env.BREVO_FROM}>`, 
+//       to: mailOptions.to,
+//       subject: mailOptions.subject,
+//       html: mailOptions.html,
+//     });
+//     console.log("✅ Email sent successfully");
+//   } catch (error) {
+//     console.error("❌ Error in send email in utils folder:", error.message);
+//   }
+// };
+// // 
+// module.exports = { sendMail };
+
+
+require("dotenv").config();
+const brevo = require("@getbrevo/brevo");
+
+const client = new brevo.TransactionalEmailsApi();
+client.setApiKey(
+  brevo.TransactionalEmailsApiApiKeys.apiKey,
+  process.env.BREVO_API_KEY
+);
+
+async function sendMail(mailOptions) {
   try {
-    await transporter.sendMail({
-      from: `"General Knowledge" <${process.env.BREVO_FROM}>`, 
-      to: mailOptions.to,
+    const sendSmtpEmail = {
+      sender: {
+        email: process.env.BREVO_SENDER_EMAIL,   // ✅ matches .env
+        name: process.env.BREVO_SENDER_NAME,    // ✅ matches .env
+      },
+      to: [{ email: mailOptions.to }],
       subject: mailOptions.subject,
-      html: mailOptions.html,
-    });
-    console.log("✅ Email sent successfully");
+      htmlContent: mailOptions.html,
+    };
+
+    const result = await client.sendTransacEmail(sendSmtpEmail);
+    // console.log("✅ Email sent:", result);
+    return result;
   } catch (error) {
-    console.error("❌ Error in send email in utils folder:", error.message);
+    console.error("❌ Error sending email:", error.response?.body || error.message);
+    throw error;
   }
-};
+}
 
 module.exports = { sendMail };
