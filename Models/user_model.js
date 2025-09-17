@@ -39,6 +39,11 @@ const userSchema = new mongoose.Schema({
     }
   ],
 
+  answers : [{
+    type : mongoose.Types.ObjectId,
+    ref : "Answers"
+  }],
+
   isAdmin : {
     type : Boolean,
     default : false

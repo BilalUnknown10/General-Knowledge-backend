@@ -8,6 +8,7 @@ const MCQ = require("../Models/MCQS_model");
 const { sendMail } = require("../Utils/send_mail");
 const { generate4DigitCode } = require("../Utils/generate_code");
 const Feedback = require("../Models/Feedback_model");
+const Answers_Model = require("../Models/Answers_model");
 let app = null;
 
 // Registration Api
@@ -166,13 +167,21 @@ const userSubmitAnswer = async (req, res) => {
     }
 
     // save submitted answer in user model
-    const saveAnswer = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        $push: { submittedAnswers: submit },
-      },
-      { new: true }
-    ).select("-password");
+    // const saveAnswer = await User.findByIdAndUpdate(
+    //   req.user._id,
+    //   {
+    //     $push: { submittedAnswers: submit },
+    //   },
+    //   { new: true }
+    // ).select("-password");
+
+    const saveAnswer = await Answers_Model.create({
+      answer : submit.answer,
+      status : submit.status,
+      userId : req.user._id
+    });
+
+    console.log("saveAnswer : ",saveAnswer);
 
     if (!saveAnswer)
       return res.status(500).json({ message: "Internal server error saved user" });
@@ -264,7 +273,19 @@ const userEmailVerification = async (req, res) => {
 // User details
 const userDetails = async (req,res) => {
   try {
-    return res.status(200).json(req.user)
+    const id = req.user._id;
+    const user = await User.aggregate([
+      {$match : {_id : id}},
+      {$lookup : {
+        from : "answers",
+        localField : "_id",
+        foreignField : "userId",
+        as : "submittedAnswers"
+
+      }}
+    ]);
+    
+    return res.status(200).json(user[0]);
   } catch (error) {
     console.log("error in user details Api in user controller file", error);
   }
