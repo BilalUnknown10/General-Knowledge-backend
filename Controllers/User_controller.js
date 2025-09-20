@@ -181,8 +181,6 @@ const userSubmitAnswer = async (req, res) => {
       userId : req.user._id
     });
 
-    console.log("saveAnswer : ",saveAnswer);
-
     if (!saveAnswer)
       return res.status(500).json({ message: "Internal server error saved user" });
 
