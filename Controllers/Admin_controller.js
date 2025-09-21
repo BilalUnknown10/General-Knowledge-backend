@@ -179,6 +179,31 @@ const deleteUserById = async(req, res) => {
     }
 }
 
+// Delete feedback by id
+const deleteFeedbackById = async (req, res) => {
+    try {
+        const {_id} = req.params;
+        if(!_id) return res.status(500).json({message : "Internal Server Error"});
+
+        const deleteFeedback = await Feedback.findByIdAndDelete({_id});
+        if(!deleteFeedback) res.status(404).json({message : "Feedback Not Found"});
+
+        return res.status(200).json({message : "Feedback Deleted Successfully"});
+    } catch (error) {
+        console.log("Error in delete feedback by id : ", error);
+    }
+}
+
+// Delete all feedbacks
+const deleteAllFeedbacks = async (req, res) => {
+    try {
+        const deleteAll = await Feedback.deleteMany({});
+        return res.status(200).json({message : "All Feedbacks Deleted Successfully"});
+    } catch (error) {
+        console.log("Error in delete all feedbacks : ", error);
+    }
+}
+
 
 
 module.exports = {
@@ -191,5 +216,7 @@ module.exports = {
     getAllFeedbacks,
     deleteAllAnswers,
     deleteAllMCQS,
-    deleteUserById
+    deleteUserById,
+    deleteFeedbackById,
+    deleteAllFeedbacks
 }

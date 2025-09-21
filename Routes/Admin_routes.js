@@ -9,7 +9,9 @@ const {
     getAllFeedbacks,
     deleteAllAnswers,
     deleteAllMCQS,
-    deleteUserById
+    deleteUserById,
+    deleteFeedbackById,
+    deleteAllFeedbacks
 } = require('../Controllers/Admin_controller');
 const authMiddleware = require('../Middlewares/Auth_middleware');
 
@@ -23,5 +25,8 @@ router.route('/allFeedbacks').get(authMiddleware,getAllFeedbacks);
 router.route('/deleteAllAnswers').delete(authMiddleware, deleteAllAnswers);
 router.route('/deleteAllMCQS').delete(authMiddleware, deleteAllMCQS);
 router.route('/deleteUserById/:_id').delete(authMiddleware, deleteUserById);
+router.route('/deleteFeedbackById/:_id').delete(authMiddleware, deleteFeedbackById);
+router.route('/deleteAllFeedbacks').delete(authMiddleware,deleteAllFeedbacks);
+
 
 module.exports = router;
