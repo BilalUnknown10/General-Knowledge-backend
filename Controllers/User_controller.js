@@ -55,7 +55,6 @@ const userRegistration = async (req, res) => {
                 <h2>Welcome to General Knowledge 🎉</h2>
                 <p>Hi <strong>${userName}</strong>,</p>
                 <p>Your account has been successfully created.</p>
-                <p>You can now <a href="https://your-app-url.com/login">log in</a> and start using our services.</p>
                 <br>
                 <p>If you have any questions, just reply to this email — we're happy to help.</p>
                 <br>

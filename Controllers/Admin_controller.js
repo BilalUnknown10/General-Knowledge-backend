@@ -1,4 +1,5 @@
 const MCQ = require("../Models/MCQS_model");
+const User = require("../Models/user_model");
 
 // upload new mcq
 const uploadMCQ = async (req, res) => {
@@ -105,10 +106,32 @@ const deleteMCQ = async (req, res) => {
     };
 };
 
+const getAllMCQS = async (req, res) => {
+    try {
+        const getAllMCQS = await MCQ.find();
+        if(!getAllMCQS) return res.status(300).json({message : "No MCQS Found"});
+        return res.status(200).json({getAllMCQS});
+    } catch (error) {
+        console.log("Error in getting all mcq's : ", error);
+    }
+};
+
+const getAllUsers = async (req, res) => {
+    try {
+        const getAllUsers = await User.find().select('-password');
+        if(!getAllUsers) return res.status(300).json({message : "No Users Found"});
+        return res.status(200).json({getAllUsers});
+    } catch (error) {
+        console.log("Error in getting all users : ", error);
+    }
+}
+
 
 module.exports = {
     uploadMCQ,
     getOneMCQ,
     editMCQ,
-    deleteMCQ
+    deleteMCQ,
+    getAllMCQS,
+    getAllUsers
 }
