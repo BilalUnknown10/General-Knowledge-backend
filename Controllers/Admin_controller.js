@@ -1,5 +1,8 @@
 const MCQ = require("../Models/MCQS_model");
 const User = require("../Models/user_model");
+const Feedback = require("../Models/Feedback_model");
+const Answers = require("../Models/Answers_model");
+
 
 // upload new mcq
 const uploadMCQ = async (req, res) => {
@@ -106,6 +109,7 @@ const deleteMCQ = async (req, res) => {
     };
 };
 
+// Get all Mcq's
 const getAllMCQS = async (req, res) => {
     try {
         const getAllMCQS = await MCQ.find();
@@ -116,6 +120,7 @@ const getAllMCQS = async (req, res) => {
     }
 };
 
+// Get all users
 const getAllUsers = async (req, res) => {
     try {
         const getAllUsers = await User.find().select('-password');
@@ -126,6 +131,55 @@ const getAllUsers = async (req, res) => {
     }
 }
 
+// Get all feedbacks
+const getAllFeedbacks = async (req, res) => {
+    try {
+        const getAllFeedbacks = await Feedback.find();
+        if(!getAllFeedbacks) return res.status(300).json({message : "No Feedbacks Found"});
+
+        return res.status(200).json(getAllFeedbacks);
+    } catch (error) {
+        console.log("Error in get all feedbacks : ", error);
+    }
+}
+
+// Delete all Mcq's
+const deleteAllMCQS = async (req, res) => {
+    try {
+        const deleteAll_MCQS = await MCQ.deleteMany({});
+        return res.status(200).json({message : "All MCQ'S Deleted Successfully"});
+    } catch (error) {
+        console.log("Error in dele all mcqs : ", error);
+    }
+}
+
+// Delete all answers
+const deleteAllAnswers = async (req, res) => {
+    try {
+        const deleteAll_Answers = await Answers.deleteMany({});
+        return res.status(200).json({message : "All Answers Deleted Successfully"});
+    } catch (error) {
+        console.log("Error in dele all answers : ", error);
+    }
+}
+
+// Delete user by id
+const deleteUserById = async(req, res) => {
+    try {
+        const {_id} = req.params;
+        if(!_id) return res.status(500).json({message : "Internal Server Error"});
+        
+        // check use exist
+        const checkUser = await User.findByIdAndDelete({_id});
+        if(!checkUser) return res.status(400).json({message : "User Not Found"});
+
+        return res.status(200).json({message : "User Deleted Successfully"});
+    } catch (error) {
+        console.log("Error in delete user by id : ", error);
+    }
+}
+
+
 
 module.exports = {
     uploadMCQ,
@@ -133,5 +187,9 @@ module.exports = {
     editMCQ,
     deleteMCQ,
     getAllMCQS,
-    getAllUsers
+    getAllUsers,
+    getAllFeedbacks,
+    deleteAllAnswers,
+    deleteAllMCQS,
+    deleteUserById
 }
