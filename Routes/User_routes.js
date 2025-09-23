@@ -13,6 +13,7 @@ const {
     getAllQuestions,
     userFeedback,
     getAllFeedbacks,
+    getAllUsers,
 } = require('../Controllers/User_controller');
 
 // User routes
@@ -29,6 +30,7 @@ router.route('/userDetails').get(authMiddleware, userDetails);
 router.route('/getAllQuestions').get(authMiddleware, getAllQuestions);
 router.route("/feedback").post(authMiddleware,userFeedback);
 router.route('/getAllFeedbacks').get(getAllFeedbacks);
+router.route('/getAllUsers').get(authMiddleware,getAllUsers);
 
 
 

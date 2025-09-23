@@ -330,6 +330,26 @@ const getAllFeedbacks = async (req, res) => {
   }
 }
 
+const getAllUsers = async (req, res) => {
+  try {
+    // const allUsers = await User.find();
+    const id = req.user._id;
+    const allUser = await User.aggregate([
+      // {$match : {_id : id}},
+      {$lookup : {
+        from : "answers",
+        localField : "_id",
+        foreignField : "userId",
+        as : "submittedAnswers"
+
+      }}
+    ]);
+    return res.status(200).json(allUser);
+  } catch (error) {
+    console.log("Error in getting all user in user controller : ", error);
+  }
+}
+
 module.exports = {
   userRegistration,
   userLogin,
@@ -341,5 +361,6 @@ module.exports = {
   userDetails,
   getAllQuestions,
   userFeedback,
-  getAllFeedbacks
+  getAllFeedbacks,
+  getAllUsers
 };
