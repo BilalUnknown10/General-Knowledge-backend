@@ -11,13 +11,18 @@ const Feedback = require("../Models/Feedback_model");
 const Answers_Model = require("../Models/Answers_model");
 let app = null;
 
+// Generate avatar url
+const avatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${Math.random()}`;
+
+
 // Registration Api
 const userRegistration = async (req, res) => {
   try {
     const { userName, email, password, CPassword } = req.body;
 
     // validation checking field are not empty
-    if(!CPassword) return res.status(400).json("Confirm password are required")
+    if (!CPassword)
+      return res.status(400).json("Confirm password are required");
     if (!userName) return res.status(400).json("Name are required");
     if (!email) return res.status(400).json("Email are required");
     if (!password) return res.status(400).json("Password are required");
@@ -26,26 +31,29 @@ const userRegistration = async (req, res) => {
       !email.includes(".com") ||
       !email.includes("gmail")
     ) {
-      return res
-        .status(400)
-        .json({
-          field: "invalidGmail",
-          message: "Only Gmail addresses are allowed",
-        });
+      return res.status(400).json({
+        field: "invalidGmail",
+        message: "Only Gmail addresses are allowed",
+      });
     }
 
-    if(password !== CPassword) return res.status(400).json("Passwords are not matched")
+    if (password !== CPassword)
+      return res.status(400).json("Passwords are not matched");
 
     // checking user already exist
     const checkExistingUser = await User.findOne({ email });
 
     if (checkExistingUser)
-      return res.status(409).json({field : "existUser", message : "User exist with this email please login"});
+      return res.status(409).json({
+        field: "existUser",
+        message: "User exist with this email please login",
+      });
 
     // create new user
-    const newUser = await User.create({ userName, email, password });
+    const newUser = await User.create({ userName, email, password, userProfileImage : avatar });
 
-    if (!newUser) return res.status(500).json({message : "Internal Server Error"});
+    if (!newUser)
+      return res.status(500).json({ message: "Internal Server Error" });
 
     // generate jwt token for authentication
     const token = await generate_JWT(newUser._id);
@@ -74,7 +82,7 @@ const userRegistration = async (req, res) => {
     });
   } catch (error) {
     console.log("error in user registration user controller", error);
-  };
+  }
 };
 
 // Login Api
@@ -84,8 +92,14 @@ const userLogin = async (req, res) => {
 
     // checking user details in DB
     const loginUser = await User.findOne({ email });
+   
+    if(!loginUser?.userProfileImage){
+      loginUser.userProfileImage = avatar;
+      loginUser.save();
+    }
 
-    if (!loginUser) return res.status(404).json("This user are not exist please register");
+    if (!loginUser)
+      return res.status(404).json("This user are not exist please register");
 
     // checking password is correct or not
     const isMatchPassword = await loginUser.comparePassword(password);
@@ -93,9 +107,7 @@ const userLogin = async (req, res) => {
 
     const token = await generate_JWT(loginUser._id);
 
-    return res
-      .status(200)
-      .json({ message: "login successfully", token });
+    return res.status(200).json({ message: "login successfully", token });
   } catch (error) {
     console.log("error user login api controller : ", error);
   }
@@ -138,6 +150,19 @@ const editUserProfileImage = async (req, res) => {
   }
 };
 
+const editUserAvatar = async (req, res) => {
+  const user = req.user;
+
+  const avatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${Math.random()}`;
+  
+  user.userProfileImage = avatar;
+  await user.save();
+
+  console.log(avatar);
+
+  return res.status(200).json("Avatar updated successfully");
+}
+
 // User submit answers Api
 const userSubmitAnswer = async (req, res) => {
   try {
@@ -160,8 +185,9 @@ const userSubmitAnswer = async (req, res) => {
     const getMcqDocument = await MCQ.findById(_id);
 
     if (!getMcqDocument)
-      return res.status(500).json({ message: "Internal server error not get document" });
-  
+      return res
+        .status(500)
+        .json({ message: "Internal server error not get document" });
 
     // checking user answer are true are not
     if (submitAnswer === getMcqDocument.correctAnswer) {
@@ -178,13 +204,15 @@ const userSubmitAnswer = async (req, res) => {
     // ).select("-password");
 
     const saveAnswer = await Answers_Model.create({
-      answer : submit.answer,
-      status : submit.status,
-      userId : req.user._id
+      answer: submit.answer,
+      status: submit.status,
+      userId: req.user._id,
     });
 
     if (!saveAnswer)
-      return res.status(500).json({ message: "Internal server error saved user" });
+      return res
+        .status(500)
+        .json({ message: "Internal server error saved user" });
 
     return res
       .status(200)
@@ -201,7 +229,7 @@ const userVerificationOTP = async (req, res) => {
     // app = generatedCode;
 
     setTimeout(() => {
-      app = null
+      app = null;
     }, 60000 * 10);
 
     const email = req.user.email;
@@ -223,11 +251,11 @@ const userVerificationOTP = async (req, res) => {
     `,
     };
 
-     await sendMail(mailOptions);
+    await sendMail(mailOptions);
 
-    const saveOTPInDb = await User.findByIdAndUpdate(req.user._id,
-      {$set : {OTP : generatedCode}}
-    );
+    const saveOTPInDb = await User.findByIdAndUpdate(req.user._id, {
+      $set: { OTP: generatedCode },
+    });
 
     return res.status(200).json({
       message: `verification code has been sent to ${req.user.email}`,
@@ -245,7 +273,7 @@ const userEmailVerification = async (req, res) => {
     const { OTP } = req.body;
 
     const verificationCode = Number(OTP);
-  
+
     if (!OTP)
       return rs.status(400).json({ message: "Please Enter verification code" });
     if (verificationCode !== req.user.OTP)
@@ -271,25 +299,26 @@ const userEmailVerification = async (req, res) => {
 };
 
 // User details
-const userDetails = async (req,res) => {
+const userDetails = async (req, res) => {
   try {
     const id = req.user._id;
     const user = await User.aggregate([
-      {$match : {_id : id}},
-      {$lookup : {
-        from : "answers",
-        localField : "_id",
-        foreignField : "userId",
-        as : "submittedAnswers"
-
-      }}
+      { $match: { _id: id } },
+      {
+        $lookup: {
+          from: "answers",
+          localField: "_id",
+          foreignField: "userId",
+          as: "submittedAnswers",
+        },
+      },
     ]);
-    
+
     return res.status(200).json(user[0]);
   } catch (error) {
     console.log("error in user details Api in user controller file", error);
   }
-}
+};
 
 // Get all questions
 const getAllQuestions = async (req, res) => {
@@ -299,39 +328,44 @@ const getAllQuestions = async (req, res) => {
   } catch (error) {
     console.log("error get all question api in user controller");
   }
-}
+};
 
 // save user Feedback
 const userFeedback = async (req, res) => {
   try {
-    const {name, email, image, feedback} = req.body;
-    if(!name || !email) return res.status(500).json({message : "Internal server error"});
-    if(!feedback) return res.status(300).json({message : "feedback are required"});
+    const { name, email, image, feedback } = req.body;
+    if (!name || !email)
+      return res.status(500).json({ message: "Internal server error" });
+    if (!feedback)
+      return res.status(300).json({ message: "feedback are required" });
 
     const saveUserFeedback = await Feedback.create({
       name,
       email,
       image,
-      feedback
+      feedback,
     });
 
-    if(!saveUserFeedback) return res.status(500).json({message : "Internal server error"});
+    if (!saveUserFeedback)
+      return res.status(500).json({ message: "Internal server error" });
 
-    return res.status(201).json({message : "Feedback added successfully Thank You"});
+    return res
+      .status(201)
+      .json({ message: "Feedback added successfully Thank You" });
   } catch (error) {
     console.log("error in user feedback save api : ", error);
   }
-}
+};
 
 // Get all feedbacks
 const getAllFeedbacks = async (req, res) => {
   try {
     const allFeedbacks = await Feedback.find();
-    return res.status(200).json({allFeedbacks});
+    return res.status(200).json({ allFeedbacks });
   } catch (error) {
     console.log("Error in get all feedbacks : ", error);
   }
-}
+};
 
 const getAllUsers = async (req, res) => {
   try {
@@ -339,19 +373,20 @@ const getAllUsers = async (req, res) => {
     const id = req.user._id;
     const allUser = await User.aggregate([
       // {$match : {_id : id}},
-      {$lookup : {
-        from : "answers",
-        localField : "_id",
-        foreignField : "userId",
-        as : "submittedAnswers"
-
-      }}
+      {
+        $lookup: {
+          from: "answers",
+          localField: "_id",
+          foreignField: "userId",
+          as: "submittedAnswers",
+        },
+      },
     ]);
     return res.status(200).json(allUser);
   } catch (error) {
     console.log("Error in getting all user in user controller : ", error);
   }
-}
+};
 
 module.exports = {
   userRegistration,
@@ -365,5 +400,6 @@ module.exports = {
   getAllQuestions,
   userFeedback,
   getAllFeedbacks,
-  getAllUsers
+  getAllUsers,
+  editUserAvatar
 };
