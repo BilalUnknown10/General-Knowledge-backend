@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require("cors");
 const app = express();
 const userRoutes = require('./Routes/User_routes');
-const adminRoutes = require('./Routes/Admin_routes')
+const adminRoutes = require('./Routes/Admin_routes');
 const dataBaseConnection = require('./DB_Connection/conn');
 const PORT = process.env.PORT;
 
@@ -25,9 +25,9 @@ dataBaseConnection();
 app.use("/user", userRoutes);
 app.use("/admin", adminRoutes);
 
-app.use('/',(req, res) => {
-    res.send("Hello This from gk server");
-});
+// app.use('/',(req, res) => {
+//     res.send("Hello This from gk server");
+// });
 
 
 

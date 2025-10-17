@@ -14,9 +14,10 @@ let app = null;
 // Registration Api
 const userRegistration = async (req, res) => {
   try {
-    const { userName, email, password } = req.body;
+    const { userName, email, password, CPassword } = req.body;
 
     // validation checking field are not empty
+    if(!CPassword) return res.status(400).json("Confirm password are required")
     if (!userName) return res.status(400).json("Name are required");
     if (!email) return res.status(400).json("Email are required");
     if (!password) return res.status(400).json("Password are required");
@@ -32,6 +33,8 @@ const userRegistration = async (req, res) => {
           message: "Only Gmail addresses are allowed",
         });
     }
+
+    if(password !== CPassword) return res.status(400).json("Passwords are not matched")
 
     // checking user already exist
     const checkExistingUser = await User.findOne({ email });

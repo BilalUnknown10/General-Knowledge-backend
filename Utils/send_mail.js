@@ -1,49 +1,49 @@
 // Send Email through nodemailer with smtp....
 
-// const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 
-// const transporter = nodemailer.createTransport({
-//   secure: true,
-//   host: "smtp.gmail.com",
-//   port: 465,
-//   auth: {
-//     user: process.env.USER, // your Gmail
-//     pass: process.env.PASS  // your App Password
-//   }
-// });
+const transporter = nodemailer.createTransport({
+  secure: true,
+  host: "smtp.gmail.com",
+  port: 465,
+  auth: {
+    user: process.env.USER, // your Gmail
+    pass: process.env.PASS  // your App Password
+  }
+});
 
-// const sendMail = async (mailOptions) => {
-//   try {
-//     await transporter.sendMail({
-//       from: `"General Knowledge" <${process.env.USER}>`, // must include FROM
-//       to: mailOptions.to,
-//       subject: mailOptions.subject,
-//       html: mailOptions.html
-//     });
-//   } catch (error) {
-//     console.log("❌ Error in send email in utils folder:", error);
-//   }
-// };
+const sendMail = async (mailOptions) => {
+  try {
+    await transporter.sendMail({
+      from: `"General Knowledge" <${process.env.USER}>`, // must include FROM
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+      html: mailOptions.html
+    });
+  } catch (error) {
+    console.log("❌ Error in send email in utils folder:", error);
+  }
+};
 
-// const isEmailValid = async (securityOptions) => {
-//   try {
-//    const info = await transporter.sendMail({
-//       from: `"General Knowledge" <${process.env.USER}>`,
-//       to: securityOptions.to,
-//       subject: securityOptions.subject,
-//       html: securityOptions.html
-//     });
+const isEmailValid = async (securityOptions) => {
+  try {
+   const info = await transporter.sendMail({
+      from: `"General Knowledge" <${process.env.USER}>`,
+      to: securityOptions.to,
+      subject: securityOptions.subject,
+      html: securityOptions.html
+    });
 
-//     console.log(info);
+    console.log(info);
 
-//     return info
+    return info
     
-//   } catch (error) {
-//     console.log("Error in security email in utils folder");
-//   }
-// };
+  } catch (error) {
+    console.log("Error in security email in utils folder");
+  }
+};
 
-// module.exports = { sendMail, isEmailValid };
+module.exports = { sendMail, isEmailValid };
 
 
 
@@ -68,7 +68,7 @@
 
 // oAuth2Client.setCredentials({ refresh_token: GMAIL_REFRESH_TOKEN });
 
-// async function sendEmail(mailOptions) {
+// async function sendMail(mailOptions) {
 //   try {
 //     const accessToken = await oAuth2Client.getAccessToken();
 
@@ -98,7 +98,7 @@
 //   }
 // }
 
-// module.exports = { sendEmail };
+// module.exports = { sendMail };
 
 
 // send email through brevo.com
@@ -131,34 +131,34 @@
 // module.exports = { sendMail };
 
 
-require("dotenv").config();
-const brevo = require("@getbrevo/brevo");
+// require("dotenv").config();
+// const brevo = require("@getbrevo/brevo");
 
-const client = new brevo.TransactionalEmailsApi();
-client.setApiKey(
-  brevo.TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY
-);
+// const client = new brevo.TransactionalEmailsApi();
+// client.setApiKey(
+//   brevo.TransactionalEmailsApiApiKeys.apiKey,
+//   process.env.BREVO_API_KEY
+// );
 
-async function sendMail(mailOptions) {
-  try {
-    const sendSmtpEmail = {
-      sender: {
-        email: process.env.BREVO_SENDER_EMAIL,   // ✅ matches .env
-        name: process.env.BREVO_SENDER_NAME,    // ✅ matches .env
-      },
-      to: [{ email: mailOptions.to }],
-      subject: mailOptions.subject,
-      htmlContent: mailOptions.html,
-    };
+// async function sendMail(mailOptions) {
+//   try {
+//     const sendSmtpEmail = {
+//       sender: {
+//         email: process.env.BREVO_SENDER_EMAIL,   // ✅ matches .env
+//         name: process.env.BREVO_SENDER_NAME,    // ✅ matches .env
+//       },
+//       to: [{ email: mailOptions.to }],
+//       subject: mailOptions.subject,
+//       htmlContent: mailOptions.html,
+//     };
 
-    const result = await client.sendTransacEmail(sendSmtpEmail);
-    // console.log("✅ Email sent:", result);
-    return result;
-  } catch (error) {
-    console.error("❌ Error sending email:", error.response?.body || error.message);
-    throw error;
-  }
-}
+//     const result = await client.sendTransacEmail(sendSmtpEmail);
+//     // console.log("✅ Email sent:", result);
+//     return result;
+//   } catch (error) {
+//     console.error("❌ Error sending email:", error.response?.body || error.message);
+//     throw error;
+//   }
+// }
 
-module.exports = { sendMail };
+// module.exports = { sendMail }
