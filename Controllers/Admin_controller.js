@@ -240,12 +240,65 @@ const deleteAllFeedbacks = async (req, res) => {
 };
 
 // Send email to all users
+// const sendEmailToAllUsers = async (req, res) => {
+//   try {
+//     const allUsers = await User.find();
+
+//     let timeStatus;
+
+//     const date = new Date();
+//     const getHours = date.getHours();
+
+//     if (getHours < 12) {
+//       timeStatus = "Good Morning";
+//     } else if (getHours >= 12 && getHours < 18) {
+//       timeStatus = "Good Evening";
+//     } else {
+//       timeStatus = "Good Night";
+//     }
+
+//     for (const user of allUsers) {
+//       const mailOptions = {
+//         to: user.email,
+//         subject: "📝 New MCQs Have Been Added!",
+//         html: `
+//       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+//         <p>Hi <strong>${user.userName}</strong>, ${timeStatus} 🌟</p>
+//         <p>Great news! 🎉 We’ve just added <strong>new Multiple Choice Questions (MCQs)</strong> to the General Knowledge platform.</p>
+//         <p>Stay sharp and test your knowledge by checking them out.</p>
+//         <br>
+//         <a href="https://general-knowledge-wine.vercel.app"
+//            style="background-color:#4CAF50; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
+//           👉 Try New MCQs
+//         </a>
+//         <br><br>
+//         <p>If you have any questions, just reply to this email — we’re always happy to help.</p>
+//         <br>
+//         <p>Cheers,<br>The General Knowledge Team</p>
+//       </div>
+//     `,
+//       };
+
+//       await sendMail(mailOptions);
+//     }
+    
+//     res.status(200).json({ message: "✅ Emails sent successfully" });
+//   } catch (error) {
+//     console.error("❌ Error in send email to all users:", error);
+//     res.status(500).json({ message: "Error sending emails" });
+//   }
+// };
+
+// 🔹 Main function to send email to all users
 const sendEmailToAllUsers = async (req, res) => {
   try {
     const allUsers = await User.find();
 
-    let timeStatus;
+    if (!allUsers || allUsers.length === 0) {
+      return res.status(404).json({ message: "No users found" });
+    }
 
+    let timeStatus;
     const date = new Date();
     const getHours = date.getHours();
 
@@ -257,31 +310,32 @@ const sendEmailToAllUsers = async (req, res) => {
       timeStatus = "Good Night";
     }
 
+    // 🔁 Loop through each user and send mail
     for (const user of allUsers) {
       const mailOptions = {
         to: user.email,
         subject: "📝 New MCQs Have Been Added!",
         html: `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-        <p>Hi <strong>${user.userName}</strong>, ${timeStatus} 🌟</p>
-        <p>Great news! 🎉 We’ve just added <strong>new Multiple Choice Questions (MCQs)</strong> to the General Knowledge platform.</p>
-        <p>Stay sharp and test your knowledge by checking them out.</p>
-        <br>
-        <a href="https://general-knowledge-wine.vercel.app"
-           style="background-color:#4CAF50; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
-          👉 Try New MCQs
-        </a>
-        <br><br>
-        <p>If you have any questions, just reply to this email — we’re always happy to help.</p>
-        <br>
-        <p>Cheers,<br>The General Knowledge Team</p>
-      </div>
-    `,
+          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <p>Hi <strong>${user.userName || "User"}</strong>, ${timeStatus} 🌟</p>
+            <p>Great news! 🎉 We’ve just added <strong>new Multiple Choice Questions (MCQs)</strong> to the General Knowledge platform.</p>
+            <p>Stay sharp and test your knowledge by checking them out.</p>
+            <br>
+            <a href="https://general-knowledge-wine.vercel.app"
+               style="background-color:#4CAF50; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
+              👉 Try New MCQs
+            </a>
+            <br><br>
+            <p>If you have any questions, just reply to this email — we’re always happy to help.</p>
+            <br>
+            <p>Cheers,<br>The General Knowledge Team</p>
+          </div>
+        `,
       };
 
-      await sendMail(mailOptions);
+      await sendMail(mailOptions); // send to each user
     }
-    
+
     res.status(200).json({ message: "✅ Emails sent successfully" });
   } catch (error) {
     console.error("❌ Error in send email to all users:", error);

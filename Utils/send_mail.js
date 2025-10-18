@@ -34,8 +34,6 @@ const isEmailValid = async (securityOptions) => {
       html: securityOptions.html
     });
 
-    console.log(info);
-
     return info
     
   } catch (error) {
