@@ -9,11 +9,11 @@ const { sendMail } = require("../Utils/send_mail");
 const { generate4DigitCode } = require("../Utils/generate_code");
 const Feedback = require("../Models/Feedback_model");
 const Answers_Model = require("../Models/Answers_model");
+const bcrypt = require("bcrypt");
 let app = null;
 
 // Generate avatar url
 const avatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${Math.random()}`;
-
 
 // Registration Api
 const userRegistration = async (req, res) => {
@@ -50,7 +50,12 @@ const userRegistration = async (req, res) => {
       });
 
     // create new user
-    const newUser = await User.create({ userName, email, password, userProfileImage : avatar });
+    const newUser = await User.create({
+      userName,
+      email,
+      password,
+      userProfileImage: avatar,
+    });
 
     if (!newUser)
       return res.status(500).json({ message: "Internal Server Error" });
@@ -92,8 +97,8 @@ const userLogin = async (req, res) => {
 
     // checking user details in DB
     const loginUser = await User.findOne({ email });
-   
-    if(!loginUser?.userProfileImage){
+
+    if (!loginUser?.userProfileImage) {
       loginUser.userProfileImage = avatar;
       loginUser.save();
     }
@@ -154,14 +159,14 @@ const editUserAvatar = async (req, res) => {
   const user = req.user;
 
   const avatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${Math.random()}`;
-  
+
   user.userProfileImage = avatar;
   await user.save();
 
   console.log(avatar);
 
   return res.status(200).json("Avatar updated successfully");
-}
+};
 
 // User submit answers Api
 const userSubmitAnswer = async (req, res) => {
@@ -388,6 +393,92 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+// Generate forget password link
+const forgetPasswordLink = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (
+      !email.includes("@") ||
+      !email.includes(".com") ||
+      !email.includes("gmail")
+    ) {
+      return res.status(400).json({
+        field: "invalidGmail",
+        message: "Only Gmail addresses are allowed",
+      });
+    }
+
+    const emailExist = await User.findOne({ email });
+
+    if (!emailExist) {
+      return res.status(403).json({ message: "Email are not found" });
+    }
+
+    const userId = emailExist._id;
+    const userName = emailExist.userName;
+
+    const mailOptions = {
+      to: email,
+      subject: "Forget Password Link From General Knowledge",
+      html: `
+    <p>Hi,${userName}</p>
+    <p>Click the link below to reset your password:</p>
+    <a href="http://localhost:5173/forgetPassword/${userId}" target="_blank">
+      Reset your password
+    </a>
+  `,
+    };
+
+    await sendMail(mailOptions);
+
+    return res.status(200).json("Mail sent successfully");
+  } catch (error) {
+    console.log("error in backend forget Password Link");
+  }
+};
+
+// Forget password
+const forgetPassword = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const { password, CPassword } = req.body;
+
+    if (!_id) {
+      return res.status(404).json({ message: "Invalid User ID" });
+    }
+    if (!password) {
+      return res.status(404).json({ message: "Password Field are required" });
+    }
+    if (!CPassword) {
+      return res
+        .status(404)
+        .json({ message: "Confirm Password Field are required" });
+    }
+    if (password !== CPassword) {
+      return res.status(403).json({ message: "Passwords do not match" });
+    }
+
+    // Hash new password
+    const hashPassword = await bcrypt.hash(password,10);
+
+    // update password
+    const updatedUser = await User.findByIdAndUpdate(
+      _id,
+      { $set: { password : hashPassword } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.log("error in forget password api", error);
+  }
+};
+
 module.exports = {
   userRegistration,
   userLogin,
@@ -401,5 +492,7 @@ module.exports = {
   userFeedback,
   getAllFeedbacks,
   getAllUsers,
-  editUserAvatar
+  editUserAvatar,
+  forgetPasswordLink,
+  forgetPassword,
 };

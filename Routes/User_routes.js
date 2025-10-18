@@ -15,6 +15,8 @@ const {
     getAllFeedbacks,
     getAllUsers,
     editUserAvatar,
+    forgetPasswordLink,
+    forgetPassword,
 } = require('../Controllers/User_controller');
 
 // User routes
@@ -33,6 +35,8 @@ router.route("/feedback").post(authMiddleware,userFeedback);
 router.route('/getAllFeedbacks').get(getAllFeedbacks);
 router.route('/getAllUsers').get(authMiddleware,getAllUsers);
 router.route('/editUserAvatar').get(authMiddleware,editUserAvatar);
+router.route('/forgetPasswordLink').post(forgetPasswordLink);
+router.route('/forgetPassword/:_id').patch(forgetPassword);
 
 
 
