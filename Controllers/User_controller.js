@@ -424,7 +424,7 @@ const forgetPasswordLink = async (req, res) => {
       html: `
     <p>Hi,${userName}</p>
     <p>Click the link below to reset your password:</p>
-    <a href="http://localhost:5173/forgetPassword/${userId}" target="_blank">
+    <a href="https://general-knowledge-wine.vercel.app/forgetPassword/${userId}" target="_blank">
       Reset your password
     </a>
   `,
