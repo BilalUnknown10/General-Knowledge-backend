@@ -321,7 +321,7 @@ const sendEmailToAllUsers = async (req, res) => {
             <p>Great news! 🎉 We’ve just added <strong>new Multiple Choice Questions (MCQs)</strong> to the General Knowledge platform.</p>
             <p>Stay sharp and test your knowledge by checking them out.</p>
             <br>
-            <a href="https://general-knowledge-wine.vercel.app"
+            <a href="https://general-knowledge-wine.vercel.app/mcqs"
                style="background-color:#4CAF50; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
               👉 Try New MCQs
             </a>
