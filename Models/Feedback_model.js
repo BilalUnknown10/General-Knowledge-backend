@@ -14,7 +14,9 @@ const userFeedback = new mongoose.Schema({
      feedback : {
         type : String,
         required : true
-    }
+    },
+    
+    image : String
 });
 
 const Feedback = mongoose.model("Feedback", userFeedback);
